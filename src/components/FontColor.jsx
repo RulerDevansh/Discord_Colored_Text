@@ -112,7 +112,6 @@ function FontColor() {
         }
     
         // Reset only the selected part
-        const range = selection.getRangeAt(0);
         let parentSpan = selection.anchorNode.parentElement;
     
         if (parentSpan && parentSpan.tagName === "SPAN") {

@@ -1,20 +1,24 @@
 import React, { useRef, useState } from 'react';
 import { Text ,Button ,Notification} from '@mantine/core';
 import {ansiColorsF,ansiColorsB} from './color'
+let content =`Hello <span class="text-[#dc322f] underline" style="color: #dc322f;">Write</span> Your <span class="text-[#d33682] font-bold" style="color: #d33682;">Discord</span> Text <span class="text-[#2aa198]" style="color: #2aa198;">Here</span> !!`;
 
 function TextArea() {
   const TextAreaRef = useRef(null);
   const [noti, setNoti] = useState(null);
-  const content =`<span style="color: #dc322f;">Write</span> Your <span style="color: #d33682;">Discord</span> Text <span style="color: #b58900;">Here !!</span>`;
   const [copyText, setCopyText] = useState('Copy');
-  const handleCopy = () => {
-    if (!TextAreaRef.current) return;
 
+
+  const handleCopy = () => {    
+    content = TextAreaRef.current.innerHTML;
+    if (TextAreaRef.current.innerHTML=="<br>") return;
+    
     let ModifiedValue = "";
     // Function to convert spans into ANSI escape codes
     const convertToAnsi = (element) => {
         let ansiString = "";
-        element.childNodes.forEach((node) => {
+
+        element.childNodes.forEach((node) => {          
             if (node.nodeType === Node.TEXT_NODE) {
                 ansiString += node.textContent;
             } else if (node.nodeType === Node.ELEMENT_NODE) {
@@ -40,7 +44,7 @@ function TextArea() {
                 }
 
                 // Extract bold
-                if (node.classList.contains("bold")) {
+                if (node.classList.contains("font-bold")) {
                     startCode += "\u001b[1m";
                 }
 
@@ -58,22 +62,30 @@ function TextArea() {
 
     ModifiedValue = convertToAnsi(TextAreaRef.current);
 
+
+
     // Wrap in Discord's ANSI code block
     const discordAnsiCode = `\`\`\`ansi\n${ModifiedValue}\n\`\`\``;
 
     navigator.clipboard.writeText(discordAnsiCode).then(() => {
-      setNoti(<Notification onClose={()=>{setNoti(null)}} radius="xl" title="Copied !!"></Notification>)
+      setTimeout(() => {
+        setNoti(null);
+      }, 1000);
+      setNoti(<Notification withCloseButton={false} radius="xl" title="Copied !!"></Notification>);
     }).catch((err) => {
       console.error("Failed to copy: ", err);
-      setNoti(<Notification onClose={()=>{setNoti(null)}} radius="xl" title="Failed to copy !!"></Notification>)
+      setTimeout(() => {
+        setNoti(null);
+      }, 1000);
+      setNoti(<Notification withCloseButton={false} radius="xl" title="Failed to Copy !!"></Notification>);
 });
 
     setCopyText('Copied!!');
     setTimeout(() => {
         setCopyText('Copy');
     }, 1000);
-
     console.log(discordAnsiCode);
+    
 };
 
   return (
